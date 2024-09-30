@@ -37,7 +37,7 @@ pipeline {
         //     }
         // }
 
-        stage('Test Docker Image') {
+stage('Test Docker Image') {
     steps {
         script {
             // Xóa container nếu tồn tại
@@ -49,11 +49,9 @@ pipeline {
             // Tăng thời gian chờ lên để container khởi động
             sleep 60
             
-            // Kiểm tra container hoạt động và logs chi tiết
-            sh 'echo "Checking if the application is reachable..."'
-            sh 'docker ps -a' // Liệt kê tất cả các container
-            sh 'docker logs test-container' // Xem logs của container
-            sh 'curl -v http://$(hostname -i):5000 || echo "Failed to connect to container"'
+            // Lấy địa chỉ IP của container và kiểm tra kết nối
+            def container_ip = sh(script: "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container", returnStdout: true).trim()
+            sh "curl -v http://${container_ip}:5000 || echo 'Failed to connect to container'"
 
             // Dừng và xóa container sau khi test xong
             sh 'docker stop test-container'
@@ -61,6 +59,7 @@ pipeline {
         }
     }
 }
+
 
         stage('Deploy to Staging') {
     steps {
