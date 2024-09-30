@@ -1,51 +1,81 @@
 pipeline {
     agent any
+    
+    environment {
+        DOCKER_IMAGE = "vahtyah/flask-app:${env.BUILD_ID}"
+        STAGING_SERVER = "staging-server-address"
+        PROD_SERVER = "prod-server-address"
+    }
+    
     stages {
-        stage('Clone') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Clone...'
+                script {
+                    // Building the Docker image
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                }
             }
         }
-        stage('Build') {
+        
+        stage('Test Docker Image') {
             steps {
-                echo 'Building...'
-                // Các bước build
+                script {
+                    // Running the Docker container for testing
+                    sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+                    sleep 5 // Wait for the container to be ready
+                    
+                    // Running tests (a basic check in this example)
+                    sh 'curl -f http://localhost:5000'
+                    
+                    // Stopping the test container
+                    sh 'docker stop test-container'
+                    sh 'docker rm test-container'
+                }
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                // Các bước kiểm thử
-            }
-        }
+        
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to Staging...'
-                // Các bước deploy đến staging
-
+                script {
+                    // Deploy to the staging server
+                    sh "ssh user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
+                    
+                    // Check if the application is running successfully
+                    sh "curl -f http://${STAGING_SERVER}:5000"
+                }
             }
         }
+        
+        stage('Approval for Production Deployment') {
+            steps {
+                // Wait for manual approval
+                input message: 'Deploy to production?', ok: 'Yes, proceed.'
+            }
+        }
+        
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to Production...'
-                // Các bước deploy đến production
-
+                script {
+                    // Deploy to the production server
+                    sh "ssh user@${PROD_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-prod ${DOCKER_IMAGE}'"
+                    
+                    // Check if the application is running successfully
+                    sh "curl -f http://${PROD_SERVER}:5000"
+                }
             }
         }
     }
-
+    
     post {
         always {
-            echo 'This will always run after all stages'
+            // Cleanup local Docker images
+            sh 'docker rmi ${DOCKER_IMAGE}'
         }
         success {
-            echo 'This will run only if all stages are successful'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'This will run only if any stage fails'
-            mail to: 'vahtyah@gmail.com',
-                 subject: "Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} Failed",
-                 body: "The pipeline has failed. Please check the build output at ${env.BUILD_URL}"
+            echo 'Pipeline failed!'
         }
     }
 }
