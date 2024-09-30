@@ -91,7 +91,7 @@ pipeline {
     
     post {
         always {
-            Dừng và xóa container nếu nó vẫn đang chạy
+            //Dừng và xóa container nếu nó vẫn đang chạy
             script {
                 // Kiểm tra và dừng container trước khi xóa
                 sh 'docker stop test-container || true'
