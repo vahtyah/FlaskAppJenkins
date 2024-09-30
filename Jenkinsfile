@@ -16,24 +16,24 @@ pipeline {
             }
         }
         
-        // stage('Test Docker Image') {
-        //     steps {
-        //         script {
-        //             // sh 'docker rm -f test-container || true'
-        //             // Running the Docker container for testing
-        //             // sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
-        //             sh 'docker run -d -p 0.0.0.0:5000:5000 --name test-container ${DOCKER_IMAGE}'
-        //             sleep 5 // Wait for the container to be ready
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    // sh 'docker rm -f test-container || true'
+                    // Running the Docker container for testing
+                    // sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+                    sh 'docker run -d -p 0.0.0.0:5000:5000 --name test-container ${DOCKER_IMAGE}'
+                    sleep 5 // Wait for the container to be ready
                     
-        //             // Running tests (a basic check in this example)
-        //             sh 'curl -f http://localhost:5000'
+                    // Running tests (a basic check in this example)
+                    sh 'curl -f http://localhost:5000'
                     
-        //             // Stopping the test container
-        //             sh 'docker stop test-container'
-        //             sh 'docker rm test-container'
-        //         }
-        //     }
-        // }
+                    // Stopping the test container
+                    sh 'docker stop test-container'
+                    sh 'docker rm test-container'
+                }
+            }
+        }
 
         stage('Test Docker Image') {
     steps {
