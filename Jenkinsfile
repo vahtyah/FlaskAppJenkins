@@ -24,7 +24,7 @@ pipeline {
                     
                     // Chạy container để test
                     sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
-                    sleep 15 // Tăng thời gian chờ lên 15 giây
+                    sleep 30 // Tăng thời gian chờ lên 15 giây
                     
                     // Kiểm tra container hoạt động
                     sh 'echo "Checking if the application is reachable..."'
