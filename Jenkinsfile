@@ -21,9 +21,6 @@ pipeline {
                 script {
                     sh 'docker stop test-container || true'
                     sh 'docker rm test-container || true'
-            
-                    // Sau đó xóa image
-                    sh 'docker rmi -f ${DOCKER_IMAGE}'
                     // Running the Docker container for testing
                     // sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
                     sh 'docker run -d -p 0.0.0.0:5000:5000 --name test-container ${DOCKER_IMAGE}'
