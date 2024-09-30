@@ -19,7 +19,7 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    sh 'docker rm -f test-container || true'
+                    // sh 'docker rm -f test-container || true'
                     // Running the Docker container for testing
                     // sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
                     sh 'docker run -d -p 0.0.0.0:5000:5000 --name test-container ${DOCKER_IMAGE}'
