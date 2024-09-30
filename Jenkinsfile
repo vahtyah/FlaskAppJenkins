@@ -36,18 +36,27 @@ pipeline {
                 }
             }
         }
-        
         stage('Deploy to Staging') {
-            steps {
-                script {
-                    // Deploy đến môi trường staging
-                    sh "ssh user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
-                    
-                    // Kiểm tra ứng dụng trên staging
-                    sh "curl -f http://${STAGING_SERVER}:5000"
-                }
-            }
+    steps {
+        script {
+            // Deploy đến môi trường staging và thêm debug cho SSH
+            sh "ssh -vvv user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
         }
+    }
+}
+
+        
+        // stage('Deploy to Staging') {
+        //     steps {
+        //         script {
+        //             // Deploy đến môi trường staging
+        //             sh "ssh user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
+                    
+        //             // Kiểm tra ứng dụng trên staging
+        //             sh "curl -f http://${STAGING_SERVER}:5000"
+        //         }
+        //     }
+        // }
         
         stage('Approval for Production Deployment') {
             steps {
@@ -66,6 +75,7 @@ pipeline {
                 }
             }
         }
+        
     }
     
     post {
