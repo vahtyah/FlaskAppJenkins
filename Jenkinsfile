@@ -46,6 +46,7 @@ stage('Test Docker Image') {
             // Chạy container để test
             sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
             
+            
             // Tăng thời gian chờ lên để container khởi động
             sleep 60
             
@@ -65,7 +66,9 @@ stage('Test Docker Image') {
     steps {
         script {
             // Deploy đến môi trường staging và thêm debug cho SSH
-            sh "ssh -vvv user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
+            // sh "ssh -vvv user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
+            sh "ssh -o StrictHostKeyChecking=no user@${STAGING_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-staging ${DOCKER_IMAGE}'"
+
         }
     }
 }
