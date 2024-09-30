@@ -16,26 +16,52 @@ pipeline {
             }
         }
         
-        stage('Test Docker Image') {
-            steps {
-                script {
-                    // Xóa container nếu tồn tại
-                    sh 'docker rm -f test-container || true'
+        // stage('Test Docker Image') {
+        //     steps {
+        //         script {
+        //             // Xóa container nếu tồn tại
+        //             sh 'docker rm -f test-container || true'
                     
-                    // Chạy container để test
-                    sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
-                    sleep 60 // Tăng thời gian chờ lên 15 giây
+        //             // Chạy container để test
+        //             sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+        //             sleep 60 // Tăng thời gian chờ lên 15 giây
                     
-                    // Kiểm tra container hoạt động
-                    sh 'echo "Checking if the application is reachable..."'
-                    sh 'curl -v http://$(hostname -i):5000 || echo "Failed to connect to container"'
+        //             // Kiểm tra container hoạt động
+        //             sh 'echo "Checking if the application is reachable..."'
+        //             sh 'curl -v http://$(hostname -i):5000 || echo "Failed to connect to container"'
 
-                    // Dừng và xóa container sau khi test xong
-                    sh 'docker stop test-container'
-                    sh 'docker rm test-container'
-                }
-            }
+        //             // Dừng và xóa container sau khi test xong
+        //             sh 'docker stop test-container'
+        //             sh 'docker rm test-container'
+        //         }
+        //     }
+        // }
+
+        stage('Test Docker Image') {
+    steps {
+        script {
+            // Xóa container nếu tồn tại
+            sh 'docker rm -f test-container || true'
+            
+            // Chạy container để test
+            sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+            
+            // Tăng thời gian chờ lên để container khởi động
+            sleep 60
+            
+            // Kiểm tra container hoạt động và logs chi tiết
+            sh 'echo "Checking if the application is reachable..."'
+            sh 'docker ps -a' // Liệt kê tất cả các container
+            sh 'docker logs test-container' // Xem logs của container
+            sh 'curl -v http://$(hostname -i):5000 || echo "Failed to connect to container"'
+
+            // Dừng và xóa container sau khi test xong
+            sh 'docker stop test-container'
+            sh 'docker rm test-container'
         }
+    }
+}
+
         stage('Deploy to Staging') {
     steps {
         script {
@@ -44,6 +70,7 @@ pipeline {
         }
     }
 }
+
 
         
         // stage('Deploy to Staging') {
