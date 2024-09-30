@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = "vahtyah/flask-app:${env.BUILD_ID}"
-        STAGING_SERVER = "staging-server-address"
+        STAGING_SERVER = "192.168.1.100"
         PROD_SERVER = "prod-server-address"
     }
     
@@ -91,17 +91,17 @@ pipeline {
     
     post {
         always {
-            // Dừng và xóa container nếu nó vẫn đang chạy
-            // script {
-            //     // Kiểm tra và dừng container trước khi xóa
-            //     sh 'docker stop test-container || true'
-            //     sh 'docker rm test-container || true'
-            // }
+            Dừng và xóa container nếu nó vẫn đang chạy
+            script {
+                // Kiểm tra và dừng container trước khi xóa
+                sh 'docker stop test-container || true'
+                sh 'docker rm test-container || true'
+            }
     
-            // // Sau đó xóa image
-            // script {
-            //     sh 'docker rmi -f ${DOCKER_IMAGE} || true'
-            // }
+            // Sau đó xóa image
+            script {
+                sh 'docker rmi -f ${DOCKER_IMAGE} || true'
+            }
         }
         success {
             echo 'Pipeline completed successfully!'
