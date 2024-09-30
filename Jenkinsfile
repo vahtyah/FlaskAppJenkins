@@ -1,6 +1,5 @@
 pipeline {
     agent any
-    
     environment {
         DOCKER_IMAGE = "vahtyah/flask-app:${env.BUILD_ID}"
         STAGING_SERVER = "staging-server-address"
