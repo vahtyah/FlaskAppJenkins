@@ -21,7 +21,8 @@ pipeline {
             steps {
                 script {
                     // Running the Docker container for testing
-                    sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+                    // sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+                    sh 'docker run -d -p 0.0.0.0:5000:5000 --name test-container ${DOCKER_IMAGE}'
                     sleep 5 // Wait for the container to be ready
                     
                     // Running tests (a basic check in this example)
