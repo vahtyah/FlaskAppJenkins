@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = "vahtyah/flask-app:${env.BUILD_ID}"
         STAGING_SERVER = "192.168.3.91" // Địa chỉ chính xác của server staging
         PROD_SERVER = "prod-server-address"
+        DOCKER_HOST = 'tcp://host.docker.internal:2375'
     }
     
     stages {
