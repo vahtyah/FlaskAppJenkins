@@ -121,6 +121,10 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed!'
+            echo 'This will run only if any stage fails'
+            mail to: 'vahtyah@gmail.com',
+                 subject: "Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} Failed",
+                 body: "The pipeline has failed. Please check the build output at ${env.BUILD_URL}"
         }
     }
 }
