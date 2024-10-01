@@ -102,44 +102,60 @@ stage('Test Docker Image') {
         //     }
         // }
         
-        stage('Approval for Production Deployment') {
-            steps {
-                input message: 'Deploy to production?', ok: 'Yes, proceed.'
-            }
+stage('Approval for Production Deployment') {
+    steps {
+        input message: 'Deploy to production?', ok: 'Yes, proceed.'
+    }
+}
+
+stage('Deploy to Production') {
+    steps {
+        script {
+            // Xóa container production nếu tồn tại
+            sh 'docker rm -f flask-prod || true'
+            
+            // Chạy container production
+            sh 'docker run -d -p 5002:5000 --name flask-prod ${DOCKER_IMAGE}'
+            
+            // Tăng thời gian chờ để container khởi động
+            sleep 10
+            
+            // Kiểm tra ứng dụng trên production
+            sh 'curl -f http://localhost:5002'
         }
-        
-        stage('Deploy to Production') {
-            steps {
-                script {
-                    // Deploy đến môi trường production
-                    sh "ssh user@${PROD_SERVER} 'docker pull ${DOCKER_IMAGE} && docker run -d -p 5000:5000 --name flask-prod ${DOCKER_IMAGE}'"
-                    
-                    // Kiểm tra ứng dụng trên production
-                    sh "curl -f http://${PROD_SERVER}:5000"
-                }
-            }
-        }
+    }
+}
+
         
     }
     
-    post {
-        always {
-            script {
-                // Dừng và xóa container test nếu nó vẫn đang chạy
-                sh 'docker stop test-container || true'
-                sh 'docker rm test-container || true'
-            }
+post {
+    always {
+        script {
+            // Dừng và xóa container test nếu nó vẫn đang chạy
+            sh 'docker stop test-container || true'
+            sh 'docker rm test-container || true'
             
-            // Xóa image Docker
-            script {
-                sh 'docker rmi -f ${DOCKER_IMAGE} || true'
-            }
+            // Dừng và xóa container staging
+            sh 'docker stop flask-staging || true'
+            sh 'docker rm flask-staging || true'
+            
+            // Dừng và xóa container production
+            sh 'docker stop flask-prod || true'
+            sh 'docker rm flask-prod || true'
         }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed!'
+        
+        // Xóa image Docker
+        script {
+            sh 'docker rmi -f ${DOCKER_IMAGE} || true'
         }
     }
+    success {
+        echo 'Pipeline completed successfully!'
+    }
+    failure {
+        echo 'Pipeline failed!'
+    }
+}
+
 }
