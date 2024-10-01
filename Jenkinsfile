@@ -28,13 +28,16 @@ pipeline {
                     sh 'docker rm -f test-container || true'
                     
                     // Chạy container để test
-                    sh 'docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}'
+                    sh 'docker run -d --name test-container ${DOCKER_IMAGE}'
                     
                     // Tăng thời gian chờ để container khởi động
                     sleep 10
                     
+                    // Lấy địa chỉ IP của container
+                    def container_ip = sh(script: "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container", returnStdout: true).trim()
+                    
                     // Kiểm tra ứng dụng hoạt động
-                    sh 'curl -f http://localhost:5000'
+                    sh "curl -f http://${container_ip}:5000"
                     
                     // Dừng và xóa container sau khi test xong
                     sh 'docker stop test-container'
@@ -50,13 +53,16 @@ pipeline {
                     sh 'docker rm -f flask-staging || true'
                     
                     // Chạy container staging
-                    sh 'docker run -d -p 5001:5000 --name flask-staging ${DOCKER_IMAGE}'
+                    sh 'docker run -d --name flask-staging ${DOCKER_IMAGE}'
                     
                     // Tăng thời gian chờ để container khởi động
                     sleep 10
                     
+                    // Lấy địa chỉ IP của container staging
+                    def container_ip = sh(script: "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' flask-staging", returnStdout: true).trim()
+                    
                     // Kiểm tra ứng dụng trên staging
-                    sh 'curl -f http://localhost:5001'
+                    sh "curl -f http://${container_ip}:5000"
                 }
             }
         }
@@ -74,13 +80,16 @@ pipeline {
                     sh 'docker rm -f flask-prod || true'
                     
                     // Chạy container production
-                    sh 'docker run -d -p 5002:5000 --name flask-prod ${DOCKER_IMAGE}'
+                    sh 'docker run -d --name flask-prod ${DOCKER_IMAGE}'
                     
                     // Tăng thời gian chờ để container khởi động
                     sleep 10
                     
+                    // Lấy địa chỉ IP của container production
+                    def container_ip = sh(script: "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' flask-prod", returnStdout: true).trim()
+                    
                     // Kiểm tra ứng dụng trên production
-                    sh 'curl -f http://localhost:5002'
+                    sh "curl -f http://${container_ip}:5000"
                 }
             }
         }
