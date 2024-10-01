@@ -107,8 +107,8 @@ pipeline {
                 sh 'docker rm flask-staging || true'
                 
                 // Dừng và xóa container production
-                sh 'docker stop flask-prod || true'
-                sh 'docker rm flask-prod || true'
+                // sh 'docker stop flask-prod || true'
+                // sh 'docker rm flask-prod || true'
             }
             
             // Xóa image Docker
