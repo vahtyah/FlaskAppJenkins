@@ -9,6 +9,12 @@ pipeline {
     }
     
     stages {
+        stage('Verify Docker Access') {
+            steps {
+                sh 'docker version'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
