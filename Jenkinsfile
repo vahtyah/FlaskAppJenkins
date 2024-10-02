@@ -1,7 +1,7 @@
 pipeline {
     agent any
     
-    environment {
+    environment 
         DOCKER_IMAGE = "vahtyah/flask-app:${env.BUILD_ID}"
         DOCKER_HOST = 'tcp://host.docker.internal:2375'
     }
